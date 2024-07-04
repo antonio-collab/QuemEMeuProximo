@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Director {
+  id        Int        @id @default(autoincrement())
+  name      String
+  phone     String
+  email     String     @unique
+  password  String
+  classes   Class[]
+  students  Student[]
+  subjects  Discipline[]
+}
+
+model Class {
+  id         Int         @id @default(autoincrement())
+  name       String
+  students   Student[]
+  teachers   Teacher[]
+  subjects   Discipline[]
+  directorId Int
+  director   Director    @relation(fields: [directorId], references: [id])
+}
+
+model Student {
+  id         Int         @id @default(autoincrement())
+  name       String
+  classes    Class[]
+  directorId Int
+  director   Director    @relation(fields: [directorId], references: [id])
+  frequencies Frequency[]
+}
+
+model Teacher {
+  id        Int        @id @default(autoincrement())
+  name      String
+  classes   Class[]
+  email     String     @unique
+  password  String
+  phone     String
+}
+
+model Discipline {
+  id         Int         @id @default(autoincrement())
+  name       String
+  classes    Class[]
+  directorId Int
+  director   Director    @relation(fields: [directorId], references: [id])
+  classrooms Classroom[]
+}
+
+model Classroom {
+  id           Int          @id @default(autoincrement())
+  date         DateTime
+  topic        String
+  disciplineId Int
+  discipline   Discipline   @relation(fields: [disciplineId], references: [id])
+  frequencies  Frequency[]
+}
+
+model Frequency {
+  id           Int          @id @default(autoincrement())
+  classroomId  Int
+  studentId    Int
+  present      Boolean
+  dateRecorded DateTime     @default(now())
+  classroom    Classroom    @relation(fields: [classroomId], references: [id])
+  student      Student      @relation(fields: [studentId], references: [id])
+}
